@@ -1,4 +1,4 @@
-;; cleandesk.el --- org-roam-replica or org-roam-ripgrep -*- lexical-binding: t -*-
+;; cleandesk.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2024 Free Software Foundation, Inc.
 

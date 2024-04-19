@@ -49,15 +49,15 @@ Finally, you may also want to set keybindings for the main functions (I have bou
 
 ** Usage
 
-Somehow files keep landing on my Desktop, often either as the attachment of an email, the contents of an SD card or via my scanner. The Desktop is effectively my inbox. But files should not remain there and I want them to go into the correct folder on my hard drive. Usually I also want to either prepend the creation date (with the date in the correct format) or also, in addition, change the name itself. Sometimes, for example when dealing with scans or photos, I want to rename and refile several files in one go. And often I am looking for a file and quickly want to jump to a folder. Cleandesk can help with all of these tasks.
-
 *** To the Inbox
 
 To quickly go to the Cleandesk inbox invoke M-x =cleandesk-open-inbox= (or the keybinding you have set). This will open a new Dired buffer showing the Cleandesk inbox.
 
 *** Jump to a Directory
 
-=cleandesk-jump-to-folder= allows to jump to any Cleandesk directory or its sub-directories in Dired using any completion framework. It works best in Dired (but the function can be invoked from anywhere). If no Cleandesk directory is defined the user is urged to add a directory as a Cleandesk directory (via =cleandesk-add-folder=; =cleandesk-remove-folder= in turn allows to remove a directory from the list of Cleandesk directories).  
+=cleandesk-jump-to-folder= allows to jump to any Cleandesk directory or any of its sub-directories in Dired using any completion framework. It works best in Dired (but the function can be invoked from anywhere). If no Cleandesk directory is defined the user is urged to add a directory as a Cleandesk directory (via =cleandesk-add-folder=; =cleandesk-remove-folder= in turn allows to remove a directory from the list of Cleandesk directories).
+
+This function (and =cleandesk-move-files=) is using fd, which can rapidly process 1000s of directories.
 
 *** Prepend Date
 
@@ -65,7 +65,7 @@ To quickly go to the Cleandesk inbox invoke M-x =cleandesk-open-inbox= (or the k
 
 *** Rename
 
-=cleandesk-rename= prepends the date and also renames the file itself (but does not change the file extension). This also works across all marked files in Dired.
+=cleandesk-rename= prepends the creation date and also renames the file itself (but does not change the file extension). This also works across all marked files in Dired.
 
 *** Move Files
 
