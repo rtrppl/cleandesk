@@ -5,8 +5,8 @@
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL:
 ;; Version: 0.1
-;; Package-Requires: emacs "26", rg
-;; Keywords: org-roam notes zettelkasten
+;; Package-Requires: emacs "26", fd
+;; Keywords: files folders dired
 
 ;; This file is not part of GNU Emacs.
 
@@ -25,14 +25,12 @@
 
 ;;; Commentary:
 
-;; cleandesk.el allows for quickly processing and refiling files across directories.
+;; cleandesk.el allows for quickly processing files across directories.
 ;;
-
-(defvar cleandesk-data-folders '("/Users/renetrappel/Documents/"))
 
 (defvar cleandesk-inbox-folder "~/Desktop/")
 
-(defvar date-string "%Y_%m_%d-%H%M%S")
+(defvar date-string "%Y_%m_%d-%H%M%S-")
 
 (defvar fd-search-string "fd -t d --no-hidden .")
 
@@ -83,7 +81,7 @@
 		(extension (file-name-extension file))
 		(old-directory (file-name-directory file))
 		(time (format-time-string date-string (nth 5 (file-attributes file))))
-		(new-filename (concat old-directory time "-" token "." extension)))
+		(new-filename (concat old-directory time token "." extension)))
 	(rename-file old-filename new-filename))))
   (revert-buffer))
 
@@ -95,18 +93,16 @@
 	 (let* ((old-filename (file-name-nondirectory file))
 		(old-directory (file-name-directory file))
 		(time (format-time-string date-string (nth 5 (file-attributes file))))
-		(new-filename (concat old-directory time "-" old-filename)))
+		(new-filename (concat old-directory time old-filename)))
 	(rename-file old-filename new-filename))))
   (revert-buffer))
 
 (defun cleandesk-check-for-cd-file ()
  "Creates a cleandesk file in ~/.cleandesk-directory-list in case one does not yet exist."
+ (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (when (not (file-exists-p "~/.cleandesk-directory-list"))
-   (puthash "preset" ((expand-file-name cleandesk-data-folders) cleandesk-name-directory)
-   (with-temp-buffer
-	  (let ((json-data (json-encode cleandesk-name-directory)))
-	    (insert json-data)
-	    (write-file "~/.cleandesk-directory-list"))))))
+   (read-char "You need to add at least one folder as a Cleandesk folder. Press any key to proceed.")
+   (cleandesk-add-folder)))
 
 (defun cleandesk-get-folder-list ()
  "Return cleandesk-name-directory, a hashtable that includes a list of names and locations of all directories that cleandesk considers."
@@ -120,18 +116,25 @@
 (defun cleandesk-add-folder ()
   "Add a directory as a cleandesk directory."
   (interactive)
-  (cleandesk-get-folder-list)
-  (let* ((new-directory (expand-file-name (read-directory-name "Enter a directory name: "))))
-    (if (yes-or-no-p (format "Are you sure you want to add %s as a new cleandesk directory? " new-directory))
+  (setq cleandesk-name-directory (make-hash-table :test 'equal))
+  (let* ((new-directory (expand-file-name (read-directory-name "Enter a directory name: ")))
+	 (name (read-from-minibuffer "Please provide a name for the new Cleandesk directory: ")))
+    (if (yes-or-no-p (format "Are you sure you want to add %s as a new Cleandesk directory? " new-directory))
 	(progn
-	  (unless (file-exists-p new-directory)
-	    (make-directory new-directory t))
-	  (let* ((name (read-from-minibuffer "Please provide a name for the new cleandesk directory: ")))
-	    (puthash name new-directory cleandesk-name-directory)
+	  (when (not (file-exists-p "~/.cleandesk-directory-list"))
+	    (unless (file-exists-p new-directory)
+	      (make-directory new-directory t))
+	    (puthash name new-directory cleandesk-name-directory))
+	  (when (file-exists-p "~/.cleandesk-directory-list")
+	    (with-temp-buffer
+	      (insert-file-contents "~/.cleandesk-directory-list")
+	      (if (fboundp 'json-parse-buffer)
+		  (setq cleandesk-name-directory (json-parse-buffer))))
+	    (puthash name new-directory cleandesk-name-directory))
 	    (with-temp-buffer
 	     (let* ((json-data (json-encode cleandesk-name-directory)))
 	       (insert json-data)
-	       (write-file "~/.cleandesk-directory-list")))))
+	       (write-file "~/.cleandesk-directory-list"))))
     (message "%s was not created!" new-directory))
   (clrhash cleandesk-name-directory)))
 
@@ -148,9 +151,11 @@
       (if (yes-or-no-p (format "Are you sure you want to remove %s as a cleandesk directory? " (gethash selection cleandesk-name-directory)))
 	  (progn
 	    (remhash selection cleandesk-name-directory)
+	    (when (not (eq (hash-table-count cleandesk-name-directory) 0)) 
 	    (with-temp-buffer
 	      (setq json-data (json-encode cleandesk-name-directory))
 	      (insert json-data)
-	      (write-file "~/.cleandesk-directory-list"))
-	    (setq org-directory (gethash "main" cleandesk-name-directory))))))
-  (clrhash cleandesk-name-directory))
+	      (write-file "~/.cleandesk-directory-list")))
+	    (when (eq (hash-table-count cleandesk-name-directory) 0)
+	      (delete-file "~/.cleandesk-directory-list")))
+  (clrhash cleandesk-name-directory)))))
