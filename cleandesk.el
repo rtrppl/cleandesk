@@ -30,7 +30,7 @@
 
 (defvar cleandesk-data-folders '("/Users/renetrappel/Documents/"))
 
-(defvar cleandesk-inbox-folder "/Users/renetrappel/Desktop/")
+(defvar cleandesk-inbox-folder "~/Desktop/")
 
 (defvar date-string "%Y_%m_%d-%H%M%S")
 
@@ -109,7 +109,7 @@
 	    (write-file "~/.cleandesk-directory-list"))))))
 
 (defun cleandesk-get-folder-list ()
- "Return cleandesk-name-directory, a hashtable that includes a list of names and locations of all directories."
+ "Return cleandesk-name-directory, a hashtable that includes a list of names and locations of all directories that cleandesk considers."
  (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (cleandesk-check-for-cd-file)
  (with-temp-buffer
@@ -136,7 +136,7 @@
   (clrhash cleandesk-name-directory)))
 
 (defun cleandesk-remove-folder ()
-  "Allow to remove a cleandesk directory for the list of cleandesk directories."
+  "Remove a directory from the list of cleandesk directories."
   (interactive)
   (cleandesk-get-folder-list)
   (setq directories (hash-table-keys cleandesk-name-directory))
