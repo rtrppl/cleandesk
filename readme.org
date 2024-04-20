@@ -17,7 +17,7 @@ Clone the repository:
 To run Cleandesk, you need to load the package by adding it to your .emacs or init.el:
 
 #+begin_src elisp
-(load "/path/to/cleandesk/cleandesk.el") ;; You actually only need cleandesk.el
+(load "/path/to/cleandesk/cleandesk.el") ; You actually only need cleandesk.el
 #+end_src
 
 If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
@@ -26,14 +26,14 @@ If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 (setq cleandesk-inbox-folder "~/path/to/inbox")
 #+end_src
 
-*In order to use Cleandesk you'll need fd installed on your machine.* The easiest way to do so might be [[https://brew.sh][homebrew]], i.e. =brew install fd=.
+*In order to use Cleandesk you'll need fd installed on your machine.* The easiest way to do so might be [[https://brew.sh][homebrew]], i.e. =brew install fd=.
 
 *Attention:* The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk directory*. A JSON list of these folders is stored in =~/.cleandesk-directory-list=. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). 
 
 The date-string, used by =cleandesk-prepend-date= and =cleandesk-rename= can be set via:
 
 #+begin_src elisp
-(setq date-string "%Y_%m_%d-%H%M%S-") ;; this is the standard Cleandesk date-string
+(setq date-string "%Y_%m_%d-%H%M%S-") ; this is the standard Cleandesk date-string
 #+end_src
 
 Finally, you may also want to set keybindings for the main functions (I have bound the Mac-Command Key to super/s):
@@ -57,7 +57,7 @@ To quickly go to the Cleandesk inbox invoke M-x =cleandesk-open-inbox= (or the k
 
 =cleandesk-jump-to-folder= allows to jump to any Cleandesk directory or any of its sub-directories in Dired using any completion framework. It works best in Dired (but the function can be invoked from anywhere). If no Cleandesk directory is defined the user is urged to add a directory as a Cleandesk directory (via =cleandesk-add-folder=; =cleandesk-remove-folder= in turn allows to remove a directory from the list of Cleandesk directories).
 
-This function (and =cleandesk-move-files=) is using fd, which can rapidly process 1000s of directories.
+This function (and =cleandesk-move-files=) is using fd, which can rapidly process 1000s of directories. Just to give you an idea: In my setup Cleandesk operates with more than 5000 directories and there is no delay whatsoever!
 
 *** Prepend Date
 
