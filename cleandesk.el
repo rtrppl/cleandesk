@@ -60,7 +60,7 @@
  (revert-buffer))
   
 (defun cleandesk-move-files ()
-  "Move selected files in Dired to a data folder."
+  "Move marked files in Dired to a data folder."
   (interactive)
   (cleandesk-prepapre-folder-list)
   (let ((cleandesk-target-folder (completing-read "Target folder: " cleandesk-folders))
@@ -72,7 +72,7 @@
   (revert-buffer))
 
 (defun cleandesk-rename ()
- "Complete renaming of one or multiple files."
+ "Complete renaming of one or multiple marked files."
  (interactive)
  (let ((marked-files (dired-get-marked-files))
        (token (read-from-minibuffer "Please provide a token for the new filename: ")))
@@ -86,7 +86,7 @@
   (revert-buffer))
 
 (defun cleandesk-prepend-date ()
- "Prepends date-string to one or multiple files."
+ "Prepends date-string to one or multiple marked files."
  (interactive)
  (let ((marked-files (dired-get-marked-files)))
        (dolist (file marked-files)

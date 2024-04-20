@@ -4,9 +4,9 @@
 
 ** The Idea
 
-Pictures, PDFs and all kinds of other files frequently end up on my Desktop. For many years, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for this task from within Emacs. It draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
+Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
 
-To be sure, vanilla Dired probably can do most of this. However, I believe that it is neither as convenient nor as swift.
+To be sure, vanilla Dired probably can do most of this. But perhaps neither as convenient nor as swift.
 
 ** Installation 
 
@@ -55,13 +55,13 @@ To quickly go to the Cleandesk inbox invoke M-x =cleandesk-open-inbox= (or the k
 
 *** Jump to a Directory
 
-=cleandesk-jump-to-folder= allows to jump to any Cleandesk directory or any of its sub-directories in Dired using any completion framework. It works best in Dired (but the function can be invoked from anywhere). If no Cleandesk directory is defined the user is urged to add a directory as a Cleandesk directory (via =cleandesk-add-folder=; =cleandesk-remove-folder= in turn allows to remove a directory from the list of Cleandesk directories).
+=cleandesk-jump-to-folder= allows you to jump to a Cleandesk directory or any of its sub-directories in Dired using a completion framework. While it was primarily intended for use in Dired, the function can be invoked from anywhere. If no Cleandesk directory is defined, the user is urged to add a directory as a Cleandesk directory (via =cleandesk-add-folder=).
 
-This function (and =cleandesk-move-files=) is using fd, which can rapidly process 1000s of directories. Just to give you an idea: In my setup Cleandesk operates with more than 5000 directories and there is no delay whatsoever!
+This function and =cleandesk-move-files= are using fd, which can rapidly process 1000s of directories. To give you an idea: In my setup, Cleandesk operates with more than 5000 directories and there is no noticeable delay when preparing the list of directories for completion!
 
 *** Prepend Date
 
-=cleandesk-prepend-date= prepends the date the file was created to the filename. If multiple files are marked in Dired, the date-string will be prepended to all of them.
+=cleandesk-prepend-date= prepends the creation date of the file to the filename. If multiple files are marked in Dired, the date-string will be prepended to all of them.
 
 *** Rename
 
@@ -69,7 +69,7 @@ This function (and =cleandesk-move-files=) is using fd, which can rapidly proces
 
 *** Move Files
 
-=cleandesk-move-files= moves all marked files to a Cleandesk directory or its sub-directories (chosen via a completing framework such as Helm or Vertico). 
+=cleandesk-move-files= moves all marked files to a chosen Cleandesk directory or one of its sub-directories (selected via a completing framework such as Helm or Vertico). 
 
 *** Housekeeping 
 
