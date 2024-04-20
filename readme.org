@@ -4,9 +4,9 @@
 
 ** The Idea
 
-Pictures, PDFs and all kinds of other files frequently end up on my Desktop. For many years I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for this task from within Emacs. It draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
+Pictures, PDFs and all kinds of other files frequently end up on my Desktop. For many years, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for this task from within Emacs. It draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
 
-To be sure, vanilla Dired probably can do most of this. But I think it is neither as convenient nor speedy.
+To be sure, vanilla Dired probably can do most of this. However, I believe that it is neither as convenient nor as swift.
 
 ** Installation 
 
@@ -28,15 +28,15 @@ If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 
 *In order to use Cleandesk you'll need fd installed on your machine.* The easiest way to do so might be [[https://brew.sh][homebrew]], i.e. =brew install fd=.
 
-*Attention:* The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *cleandesk directory*. A JSON list of these folders is stored in =~/.cleandesk-directory-list=.  
+*Attention:* The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk directory*. A JSON list of these folders is stored in =~/.cleandesk-directory-list=. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). 
 
 The date-string, used by =cleandesk-prepend-date= and =cleandesk-rename= can be set via:
 
 #+begin_src elisp
-(setq date-string "%Y_%m_%d-%H%M%S-") ;; this the standard Cleandesk date-string
+(setq date-string "%Y_%m_%d-%H%M%S-") ;; this is the standard Cleandesk date-string
 #+end_src
 
-Finally, you may also want to set keybindings for the main functions (I have bound the Mac-command key to super/s):
+Finally, you may also want to set keybindings for the main functions (I have bound the Mac-Command Key to super/s):
 
 #+begin_src elisp
 (global-set-key (kbd "M-s-u") 'cleandesk-open-inbox)
@@ -73,4 +73,4 @@ This function (and =cleandesk-move-files=) is using fd, which can rapidly proces
 
 *** Housekeeping 
 
-=cleandesk-add-folder= adds folders to the list of Cleandesk folders, =cleandesk-remove-folder= will remove them from said list.
+=cleandesk-add-folder= adds folders to the list of Cleandesk folders, =cleandesk-remove-folder= will remove a folder from said list.

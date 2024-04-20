@@ -54,13 +54,13 @@
   (revert-buffer))
 	 
 (defun cleandesk-open-inbox ()
- "Opens the inbox folder in a dired view."
+ "Opens the inbox folder in a Dired view."
  (interactive)
  (dired cleandesk-inbox-folder)
  (revert-buffer))
   
 (defun cleandesk-move-files ()
-  "Move selected files in dired to a data folder."
+  "Move selected files in Dired to a data folder."
   (interactive)
   (cleandesk-prepapre-folder-list)
   (let ((cleandesk-target-folder (completing-read "Target folder: " cleandesk-folders))
@@ -98,14 +98,14 @@
   (revert-buffer))
 
 (defun cleandesk-check-for-cd-file ()
- "Creates a cleandesk file in ~/.cleandesk-directory-list in case one does not yet exist."
+ "Checks for Cleandesk file ~/.cleandesk-directory-list and directs to cleandesk-add-folder in case their is none."
  (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (when (not (file-exists-p "~/.cleandesk-directory-list"))
    (read-char "You need to add at least one folder as a Cleandesk folder. Press any key to proceed.")
    (cleandesk-add-folder)))
 
 (defun cleandesk-get-folder-list ()
- "Return cleandesk-name-directory, a hashtable that includes a list of names and locations of all directories that cleandesk considers."
+ "Return cleandesk-name-directory, a hashtable that includes a list of names and locations of all directories that Cleandesk considers."
  (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (cleandesk-check-for-cd-file)
  (with-temp-buffer
@@ -114,7 +114,7 @@
        (setq cleandesk-name-directory (json-parse-buffer)))))
 
 (defun cleandesk-add-folder ()
-  "Add a directory as a cleandesk directory."
+  "Add a directory to the list of Cleandesk directories."
   (interactive)
   (setq cleandesk-name-directory (make-hash-table :test 'equal))
   (let* ((new-directory (expand-file-name (read-directory-name "Enter a directory name: ")))
@@ -139,7 +139,7 @@
   (clrhash cleandesk-name-directory)))
 
 (defun cleandesk-remove-folder ()
-  "Remove a directory from the list of cleandesk directories."
+  "Remove a directory from the list of Cleandesk directories."
   (interactive)
   (cleandesk-get-folder-list)
   (setq directories (hash-table-keys cleandesk-name-directory))
