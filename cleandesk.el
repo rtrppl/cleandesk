@@ -121,9 +121,9 @@
 	 (name (read-from-minibuffer "Please provide a name for the new Cleandesk directory: ")))
     (if (yes-or-no-p (format "Are you sure you want to add %s as a new Cleandesk directory? " new-directory))
 	(progn
+	  (unless (file-exists-p new-directory)
+	    (make-directory new-directory t))
 	  (when (not (file-exists-p "~/.cleandesk-directory-list"))
-	    (unless (file-exists-p new-directory)
-	      (make-directory new-directory t))
 	    (puthash name new-directory cleandesk-name-directory))
 	  (when (file-exists-p "~/.cleandesk-directory-list")
 	    (with-temp-buffer
@@ -146,16 +146,14 @@
   (setq selection (completing-read "Which cleandesk directory should be removed? " directories))
   (if (not (member selection directories))
       (message "Directory does not exist.")
-    (if (string-equal selection "main")
-	(message "The directory \"main\" cannot be removed!")
-      (if (yes-or-no-p (format "Are you sure you want to remove %s as a cleandesk directory? " (gethash selection cleandesk-name-directory)))
+    (if (yes-or-no-p (format "Are you sure you want to remove %s as a cleandesk directory? " (gethash selection cleandesk-name-directory)))
 	  (progn
 	    (remhash selection cleandesk-name-directory)
 	    (when (not (eq (hash-table-count cleandesk-name-directory) 0)) 
-	    (with-temp-buffer
-	      (setq json-data (json-encode cleandesk-name-directory))
-	      (insert json-data)
-	      (write-file "~/.cleandesk-directory-list")))
+	      (with-temp-buffer
+		(setq json-data (json-encode cleandesk-name-directory))
+		(insert json-data)
+		(write-file "~/.cleandesk-directory-list")))
 	    (when (eq (hash-table-count cleandesk-name-directory) 0)
 	      (delete-file "~/.cleandesk-directory-list")))
-  (clrhash cleandesk-name-directory)))))
+  (clrhash cleandesk-name-directory))))
