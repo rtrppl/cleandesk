@@ -26,7 +26,11 @@ If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 (setq cleandesk-inbox-folder "~/path/to/inbox")
 #+end_src
 
-*In order to use Cleandesk you'll need fd installed on your machine.* The easiest way to do so might be [[https://brew.sh][homebrew]], i.e. =brew install fd=.
+*In order to use Cleandesk you'll want fd installed on your machine.* The easiest way to do so might be [[https://brew.sh][homebrew]], i.e. =brew install fd=. =fd= is much (!) faster than =find= but if you prefer =find=, you need to set this:
+
+#+begin_src elisp
+(setq search-tool "find") ; standard is fd
+#+end_src
 
 *Attention:* The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk directory*. A JSON list of these folders is stored in =~/.cleandesk-directory-list=. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). 
 
