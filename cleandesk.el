@@ -32,7 +32,11 @@
 
 (defvar date-string "%Y_%m_%d-%H%M%S-")
 
-(defvar fd-search-string "fd -t d --no-hidden .")
+(defvar search-tool "fd") ;; choose between find and fd; fd is much faster and standard
+
+(defvar fd-search-string "-t d --no-hidden .")
+
+(defvar find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
 
 (defun cleandesk-prepapre-folder-list ()
  "Preparing a list of all folders in the cleandesk folders for further tasks."
@@ -41,7 +45,10 @@
  (setq cleandesk-data-folders (hash-table-values cleandesk-name-directory))
    (dolist (cleandesk-data-folder cleandesk-data-folders)
      (with-temp-buffer
-       (insert (shell-command-to-string (concat fd-search-string " '" cleandesk-data-folder "' ")))
+       (when (string-equal search-tool "fd")
+	 (insert (shell-command-to-string (concat "fd " fd-search-string " '" cleandesk-data-folder "' "))))
+       (when (string-equal search-tool "find")
+	 (insert (shell-command-to-string (concat "find " cleandesk-data-folder " " find-search-string))))
        (let ((temp-folders (split-string (buffer-string) "\n" t)))
 	 (setq cleandesk-folders (append temp-folders cleandesk-folders)))))
 	 (setq cleandesk-folders (append cleandesk-data-folders cleandesk-folders)))
