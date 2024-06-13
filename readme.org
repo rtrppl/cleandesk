@@ -54,8 +54,6 @@ Finally, you may also want to set keybindings for the main functions (I have bou
 If you are on a Mac (see below) you may want to add a keybinding for cleandesk-search:
 
 #+begin_src elisp
-(load "~/Documents/GitHub/cleandesk/cleandesk.el")
-; (setq cleandesk-inbox-folder "/Users/renetrappel/Desktop/")
 (global-set-key (kbd "M-s-u") 'cleandesk-open-inbox)
 (with-eval-after-load 'dired
   (define-key dired-mode-map (kbd "J") 'cleandesk-jump-to-folder)
