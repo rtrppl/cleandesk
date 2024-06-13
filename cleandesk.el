@@ -4,7 +4,7 @@
 
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL:
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: emacs "26", fd
 ;; Keywords: files folders dired
 
@@ -164,3 +164,23 @@
 	    (when (eq (hash-table-count cleandesk-name-directory) 0)
 	      (delete-file "~/.cleandesk-directory-list")))
   (clrhash cleandesk-name-directory))))
+
+(defun cleandesk-search ()
+  "Search for all files containing a specific string in all Cleandesk directories. This is based on mdfind."
+  (interactive)
+  (cleandesk-get-folder-list)
+  (let ((cleandesk-mdfind-folders (hash-table-values cleandesk-name-directory))
+        (mdfind-search-string (read-from-minibuffer "Search for: "))
+        cleandesk-search-results)  ; Initialize as empty list
+    (dolist (cleandesk-mdfind-folder cleandesk-mdfind-folders)
+      (with-temp-buffer
+        (let ((cmd (concat "mdfind " mdfind-search-string " -onlyin " cleandesk-mdfind-folder)))
+          (insert (shell-command-to-string cmd))
+          (let ((findings (split-string (buffer-string) "\n" t)))
+            (dolist (item findings)
+              (when (and (stringp item)
+                         (string-prefix-p "/" item))
+                (push item cleandesk-search-results)))))))
+    (setq cleandesk-search-results (nreverse cleandesk-search-results))
+    (push "*Cleandesk search findings*" cleandesk-search-results)
+    (dired cleandesk-search-results)))
