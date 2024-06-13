@@ -4,7 +4,7 @@
 
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL:
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: emacs "26", fd
 ;; Keywords: files folders dired
 
@@ -37,6 +37,10 @@
 (defvar fd-search-string "-t d --no-hidden .")
 
 (defvar find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
+
+ (defun is-mac-p ()
+     "Return t if the current system is a Mac (Darwin). Cleandesk needs to check this because cleandesk-search uses mdfind (Mac-only)."
+     (eq system-type 'darwin))
 
 (defun cleandesk-prepapre-folder-list ()
  "Preparing a list of all folders in the cleandesk folders for further tasks."
@@ -164,3 +168,42 @@
 	    (when (eq (hash-table-count cleandesk-name-directory) 0)
 	      (delete-file "~/.cleandesk-directory-list")))
   (clrhash cleandesk-name-directory))))
+
+(defun cleandesk-search (arg)
+  "Search for all files containing a specific string in the current directory. This is based on mdfind/Spotlight. If called with C-u, search will expand to all all Cleandesk directories."
+  (interactive "P")
+  (when (is-mac-p)
+    (when (equal arg '(4))
+    (cleandesk-get-folder-list)
+    (let ((cleandesk-mdfind-folders (hash-table-values cleandesk-name-directory))
+          (mdfind-search-string (read-from-minibuffer "Search for: "))
+          cleandesk-search-results)  ; Initialize as empty list
+      (dolist (cleandesk-mdfind-folder cleandesk-mdfind-folders)
+	(with-temp-buffer
+          (let ((cmd (concat "mdfind " mdfind-search-string " -onlyin " cleandesk-mdfind-folder)))
+            (insert (shell-command-to-string cmd))
+            (let ((findings (split-string (buffer-string) "\n" t)))
+              (dolist (item findings)
+		(when (and (stringp item)
+                           (string-prefix-p "/" item))
+                  (push item cleandesk-search-results)))))))
+      (setq cleandesk-search-results (nreverse cleandesk-search-results))
+      (push "*Cleandesk search findings*" cleandesk-search-results)
+      (dired cleandesk-search-results)))
+    (when (null arg)
+      (let ((current-folder default-directory)
+            (mdfind-search-string (read-from-minibuffer "Search for: "))
+            cleandesk-search-results) 
+	(with-temp-buffer
+          (let ((cmd (concat "mdfind " mdfind-search-string " -onlyin " current-folder)))
+            (insert (shell-command-to-string cmd))
+            (let ((findings (split-string (buffer-string) "\n" t)))
+              (dolist (item findings)
+		(when (and (stringp item)
+                           (string-prefix-p "/" item))
+                  (push item cleandesk-search-results))))))
+      (setq cleandesk-search-results (nreverse cleandesk-search-results))
+      (push "*Cleandesk search findings*" cleandesk-search-results)
+      (dired cleandesk-search-results)))
+  (when (not (is-mac-p))
+    (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only."))))
