@@ -36,8 +36,9 @@
 (defvar cleandesk-search-tool "fd") ;; choose between find and fd; fd is much faster and standard
 (defvar fd-search-string "-t d --no-hidden .")
 (defvar find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
-(defvar cleandesk-folders nil)
+(defvar cleandesk-folders nil "All folders cleandesk operates on.")
 (defvar cleandesk-name-directory nil)
+(defvar cleandesk-data-folders nil "A hashtable that includes a list of all folders that cleandesk should opperate on (does not include subfolders.")
 
 (defun is-mac-p ()
   "Return t if the current system is a Mac (Darwin)."
@@ -111,14 +112,16 @@
   (revert-buffer))
 
 (defun cleandesk-check-for-cd-file ()
- "Checks for Cleandesk file ~/.cleandesk-directory-list and directs to cleandesk-add-folder in case their is none."
+ "Checks for Cleandesk file ~/.cleandesk-directory-list." 
+;; It directs the user to cleandesk-add-folder in case their is none.
  (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (when (not (file-exists-p "~/.cleandesk-directory-list"))
    (read-char "You need to add at least one folder as a Cleandesk folder. Press any key to proceed.")
    (cleandesk-add-folder)))
 
 (defun cleandesk-get-folder-list ()
- "Return cleandesk-name-directory, a hashtable that includes a list of names and locations of all directories that Cleandesk considers."
+ "Return cleandesk-name-directory." 
+;; cleandesk-name-directory is a hashtable that includes a list of names and locations of all directories that Cleandesk considers.
  (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (cleandesk-check-for-cd-file)
  (with-temp-buffer
@@ -172,7 +175,9 @@
 	(clrhash cleandesk-name-directory)))))
 
 (defun cleandesk-search (arg)
-  "Search for all files containing a specific string in the current directory. This is based on mdfind/Spotlight. If called with C-u, search will expand to all all Cleandesk directories."
+  "Search for all files containing a specific string in the current directory.
+ 
+This is based on mdfind/Spotlight. If called with C-u, search will expand to all all Cleandesk directories."
   (interactive "P")
   (when (is-mac-p)
     (when (equal arg '(4))
@@ -209,3 +214,5 @@
       (dired cleandesk-search-results)))
   (when (not (is-mac-p))
     (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only."))))
+
+(provide 'cleandesk)
