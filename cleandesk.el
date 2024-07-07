@@ -38,7 +38,7 @@
 (defvar find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
 (defvar cleandesk-folders nil "All folders cleandesk operates on.")
 (defvar cleandesk-name-directory nil)
-(defvar cleandesk-data-folders nil "A hashtable that includes a list of all folders that cleandesk should opperate on (does not include subfolders.")
+(defvar cleandesk-data-folders nil "Includes all folders that cleandesk should opperate on (excluding subfolders).")
 
 (defun is-mac-p ()
   "Return t if the current system is a Mac (Darwin)."
@@ -175,9 +175,8 @@
 	(clrhash cleandesk-name-directory)))))
 
 (defun cleandesk-search (arg)
-  "Search for all files containing a specific string in the current directory.
- 
-This is based on mdfind/Spotlight. If called with C-u, search will expand to all all Cleandesk directories."
+  "Search for all files containing a specific string in the current directory."
+;; This is based on mdfind/Spotlight. If called with C-u, search will expand to all Cleandesk directories.
   (interactive "P")
   (when (is-mac-p)
     (when (equal arg '(4))
