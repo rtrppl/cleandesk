@@ -4,7 +4,7 @@
 
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL:
-;; Version: 0.2
+;; Version: 0.3
 ;; Package-Requires: emacs "26", fd
 ;; Keywords: files folders dired
 
@@ -28,19 +28,22 @@
 ;; cleandesk.el allows for quickly processing files across directories.
 ;;
 
-(defvar cleandesk-inbox-folder "~/Desktop/")
+(require 'dired)  ; For dired-get-marked-files
+(require 'json)   ; For json-encode
 
+(defvar cleandesk-inbox-folder "~/")  ;; Using the home folder as a default starting point
 (defvar date-string "%Y_%m_%d-%H%M%S-")
-
 (defvar cleandesk-search-tool "fd") ;; choose between find and fd; fd is much faster and standard
-
 (defvar fd-search-string "-t d --no-hidden .")
-
 (defvar find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
+(defvar cleandesk-folders nil "All folders cleandesk operates on.")
+(defvar cleandesk-name-directory nil)
+(defvar cleandesk-data-folders nil "Includes all folders that cleandesk should opperate on (excluding subfolders).")
 
- (defun is-mac-p ()
-     "Return t if the current system is a Mac (Darwin). Cleandesk needs to check this because cleandesk-search uses mdfind (Mac-only)."
-     (eq system-type 'darwin))
+(defun is-mac-p ()
+  "Return t if the current system is a Mac (Darwin)."
+;; Cleandesk needs to check this because cleandesk-search uses mdfind (Mac-only).
+  (eq system-type 'darwin))
 
 (defun cleandesk-prepapre-folder-list ()
  "Preparing a list of all folders in the cleandesk folders for further tasks."
@@ -92,8 +95,18 @@
 		(extension (file-name-extension file))
 		(old-directory (file-name-directory file))
 		(time (format-time-string date-string (nth 5 (file-attributes file))))
-		(new-filename (concat old-directory time token "." extension)))
-	(rename-file old-filename new-filename))))
+		(new-filename (concat old-directory time token "." extension))
+		(suffix "A")
+		(last-char (aref suffix 0)))
+	   (condition-case err
+	       (rename-file old-filename new-filename)
+	     (file-error
+	      (progn
+		(while (file-exists-p new-filename)
+		  (setq new-filename (concat old-directory time token "-" suffix "." extension))
+		  (setq last-char (+ last-char 1))
+		  (setq suffix (string last-char)))
+		(rename-file old-filename new-filename)))))))
   (revert-buffer))
 
 (defun cleandesk-prepend-date ()
@@ -109,14 +122,16 @@
   (revert-buffer))
 
 (defun cleandesk-check-for-cd-file ()
- "Checks for Cleandesk file ~/.cleandesk-directory-list and directs to cleandesk-add-folder in case their is none."
+ "Checks for Cleandesk file ~/.cleandesk-directory-list." 
+;; It directs the user to cleandesk-add-folder in case their is none.
  (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (when (not (file-exists-p "~/.cleandesk-directory-list"))
    (read-char "You need to add at least one folder as a Cleandesk folder. Press any key to proceed.")
    (cleandesk-add-folder)))
 
 (defun cleandesk-get-folder-list ()
- "Return cleandesk-name-directory, a hashtable that includes a list of names and locations of all directories that Cleandesk considers."
+ "Return cleandesk-name-directory." 
+;; cleandesk-name-directory is a hashtable that includes a list of names and locations of all directories that Cleandesk considers.
  (setq cleandesk-name-directory (make-hash-table :test 'equal))
  (cleandesk-check-for-cd-file)
  (with-temp-buffer
@@ -153,24 +168,25 @@
   "Remove a directory from the list of Cleandesk directories."
   (interactive)
   (cleandesk-get-folder-list)
-  (setq directories (hash-table-keys cleandesk-name-directory))
-  (setq selection (completing-read "Which cleandesk directory should be removed? " directories))
-  (if (not (member selection directories))
-      (message "Directory does not exist.")
-    (if (yes-or-no-p (format "Are you sure you want to remove %s as a cleandesk directory? " (gethash selection cleandesk-name-directory)))
+  (let* ((directories (hash-table-keys cleandesk-name-directory))
+	(selection (completing-read "Which cleandesk directory should be removed? " directories)))
+    (if (not (member selection directories))
+	(message "Directory does not exist.")
+      (if (yes-or-no-p (format "Are you sure you want to remove %s as a cleandesk directory? " (gethash selection cleandesk-name-directory)))
 	  (progn
 	    (remhash selection cleandesk-name-directory)
 	    (when (not (eq (hash-table-count cleandesk-name-directory) 0)) 
 	      (with-temp-buffer
-		(setq json-data (json-encode cleandesk-name-directory))
-		(insert json-data)
-		(write-file "~/.cleandesk-directory-list")))
+		(let ((json-data (json-encode cleandesk-name-directory)))
+		      (insert json-data))
+		      (write-file "~/.cleandesk-directory-list")))
 	    (when (eq (hash-table-count cleandesk-name-directory) 0)
 	      (delete-file "~/.cleandesk-directory-list")))
-  (clrhash cleandesk-name-directory))))
+	(clrhash cleandesk-name-directory)))))
 
 (defun cleandesk-search (arg)
-  "Search for all files containing a specific string in the current directory. This is based on mdfind/Spotlight. If called with C-u, search will expand to all all Cleandesk directories."
+  "Search for all files containing a specific string in the current directory."
+;; This is based on mdfind/Spotlight. If called with C-u, search will expand to all Cleandesk directories.
   (interactive "P")
   (when (is-mac-p)
     (when (equal arg '(4))
@@ -207,3 +223,5 @@
       (dired cleandesk-search-results)))
   (when (not (is-mac-p))
     (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only."))))
+
+(provide 'cleandesk)
