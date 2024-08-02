@@ -95,8 +95,18 @@
 		(extension (file-name-extension file))
 		(old-directory (file-name-directory file))
 		(time (format-time-string date-string (nth 5 (file-attributes file))))
-		(new-filename (concat old-directory time token "." extension)))
-	(rename-file old-filename new-filename))))
+		(new-filename (concat old-directory time token "." extension))
+		(suffix "A")
+		(last-char (aref suffix 0)))
+	   (condition-case err
+	       (rename-file old-filename new-filename)
+	     (file-error
+	      (progn
+		(while (file-exists-p new-filename)
+		  (setq new-filename (concat old-directory time token "-" suffix "." extension))
+		  (setq last-char (+ last-char 1))
+		  (setq suffix (string last-char)))
+		(rename-file old-filename new-filename)))))))
   (revert-buffer))
 
 (defun cleandesk-prepend-date ()
