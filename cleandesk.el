@@ -37,7 +37,7 @@
 (defvar fd-search-string "-t d --no-hidden .")
 (defvar find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
 (defvar cleandesk-folders nil "All folders cleandesk operates on.")
-(defvar cleandesk-name-directory nil)
+(defvar cleandesk-name-directory (make-hash-table :test 'equal))
 (defvar cleandesk-data-folders nil "Includes all folders that cleandesk should opperate on (excluding subfolders).")
 
 (defun is-mac-p ()
@@ -122,17 +122,18 @@
   (revert-buffer))
 
 (defun cleandesk-check-for-cd-file ()
- "Checks for Cleandesk file ~/.cleandesk-directory-list." 
-;; It directs the user to cleandesk-add-folder in case their is none.
- (setq cleandesk-name-directory (make-hash-table :test 'equal))
+ "Checks for Cleandesk file ~/.cleandesk-directory-list. It directs the user 
+to cleandesk-add-folder in case there is none."
+ (clrhash cleandesk-name-directory)
  (when (not (file-exists-p "~/.cleandesk-directory-list"))
    (read-char "You need to add at least one folder as a Cleandesk folder. Press any key to proceed.")
    (cleandesk-add-folder)))
 
 (defun cleandesk-get-folder-list ()
- "Return cleandesk-name-directory." 
-;; cleandesk-name-directory is a hashtable that includes a list of names and locations of all directories that Cleandesk considers.
- (setq cleandesk-name-directory (make-hash-table :test 'equal))
+ "Return cleandesk-name-directory. cleandesk-name-directory is a hashtable 
+that includes a list of names and locations of all parent directories that 
+Cleandesk considers."
+ (clrhash cleandesk-name-directory)
  (cleandesk-check-for-cd-file)
  (with-temp-buffer
    (insert-file-contents "~/.cleandesk-directory-list")
@@ -142,7 +143,7 @@
 (defun cleandesk-add-folder ()
   "Add a directory to the list of Cleandesk directories."
   (interactive)
-  (setq cleandesk-name-directory (make-hash-table :test 'equal))
+  (clrhash cleandesk-name-directory)
   (let* ((new-directory (expand-file-name (read-directory-name "Enter a directory name: ")))
 	 (name (read-from-minibuffer "Please provide a name for the new Cleandesk directory: ")))
     (if (yes-or-no-p (format "Are you sure you want to add %s as a new Cleandesk directory? " new-directory))
@@ -185,8 +186,9 @@
 	(clrhash cleandesk-name-directory)))))
 
 (defun cleandesk-search (arg)
-  "Search for all files containing a specific string in the current directory."
-;; This is based on mdfind/Spotlight. If called with C-u, search will expand to all Cleandesk directories.
+  "Search for all files containing a specific string in the current directory. 
+This is based on mdfind/Spotlight. If called with C-u, search will expand to 
+all Cleandesk directories."
   (interactive "P")
   (when (is-mac-p)
     (when (equal arg '(4))
