@@ -97,9 +97,8 @@
 		(time (format-time-string date-string (nth 5 (file-attributes file))))
 		(new-filename (concat old-directory time token "." extension))
 		(suffix "A")
-		(last-char (aref suffix 0))
-		(err))
-	   (condition-case err
+		(last-char (aref suffix 0)))
+	   (condition-case nil
 	       (rename-file old-filename new-filename)
 	     (file-error
 	      (progn
