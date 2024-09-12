@@ -2,14 +2,16 @@
 
 *Cleandesk.el* is a collection of functions to rapidly rename and process files in Dired. 
 
-**0.4**
-- Added cleandesk-simple-rename, see section [[Rename][Rename]]
-
 ** The Idea
 
 Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
 
 To be sure, vanilla Dired probably can do most of this. But perhaps neither as convenient nor as swift.
+
+** Changelog
+
+**Version 0.4**
+- Added =cleandesk-simple-rename=, see [[Rename][Rename]]
 
 ** Installation 
 
