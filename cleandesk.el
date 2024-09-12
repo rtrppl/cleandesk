@@ -4,7 +4,7 @@
 
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL:
-;; Version: 0.3
+;; Version: 0.4
 ;; Package-Requires: emacs "26", fd
 ;; Keywords: files folders dired
 
@@ -108,6 +108,24 @@
 		  (setq suffix (string last-char)))
 		(rename-file old-filename new-filename)))))))
   (revert-buffer))
+
+(defun cleandesk-simple-rename ()
+ "Replacement for dired-do-rename for one or multiple marked files."
+ (interactive)
+ (let ((marked-files (dired-get-marked-files)))
+       (dolist (file marked-files)
+	 (let* ((old-filename file)
+		(token (read-from-minibuffer "Please change filename: " file))
+		(new-filename token))
+	   (condition-case nil
+	       (rename-file old-filename new-filename)
+	     (file-error
+	      (progn
+		(while (file-exists-p new-filename)
+		  (setq new-filename (read-from-minibuffer "Filename already exists! Please adjust : " token))
+		  (rename-file old-filename new-filename))))))))
+  (revert-buffer))
+
 
 (defun cleandesk-prepend-date ()
  "Prepends date-string to one or multiple marked files."

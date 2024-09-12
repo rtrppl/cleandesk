@@ -2,6 +2,9 @@
 
 *Cleandesk.el* is a collection of functions to rapidly rename and process files in Dired. 
 
+**0.4**
+- Added cleandesk-simple-rename, see section [[Rename][Rename]]
+
 ** The Idea
 
 Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
@@ -49,6 +52,7 @@ Finally, you may also want to set keybindings for the main functions (I have bou
   (define-key dired-mode-map (kbd "M") 'cleandesk-move-files)
   (define-key dired-mode-map (kbd "z") 'cleandesk-prepend-date)
   (define-key dired-mode-map (kbd "r") 'cleandesk-rename))
+  (define-key dired-mode-map (kbd "R") 'cleandesk-simple-rename)) ;; replaces dired-do-rename; see cleandesk-simple-rename for more
 #+end_src
 
 If you are on a Mac (see below) you may want to add a keybinding for cleandesk-search:
@@ -60,6 +64,7 @@ If you are on a Mac (see below) you may want to add a keybinding for cleandesk-s
   (define-key dired-mode-map (kbd "M") 'cleandesk-move-files)
   (define-key dired-mode-map (kbd "z") 'cleandesk-prepend-date)
   (define-key dired-mode-map (kbd "S") 'cleandesk-search)
+  (define-key dired-mode-map (kbd "R") 'cleandesk-simple-rename) ;; replaces dired-do-rename; see cleandesk-simple-rename for more
   (define-key dired-mode-map (kbd "r") 'cleandesk-rename))
 #+end_src
 
@@ -81,7 +86,7 @@ This function and =cleandesk-move-files= are using fd, which can rapidly process
 
 *** Rename
 
-=cleandesk-rename= prepends the creation date and also renames the file itself (but does not change the file extension). This also works across all marked files in Dired.
+=cleandesk-rename= prepends the creation date and also renames the file itself (but does not change the file extension). This also works across all marked files in Dired. =cleandesk-simple-rename= is a simple replacement function for =dired-do-rename=, which does have some issues when using it with ivy or consult (at least for me). The function also takes the existing filename as basis for the rename, speeding up the process. 
 
 *** Move Files
 
