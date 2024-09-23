@@ -223,9 +223,7 @@ all Cleandesk directories."
 		(when (and (stringp item)
                            (string-prefix-p "/" item))
                   (push item cleandesk-search-results)))))))
-      (setq cleandesk-search-results (nreverse cleandesk-search-results))
-      (push "*Cleandesk search findings*" cleandesk-search-results)
-      (dired cleandesk-search-results)))
+      (cleandesk-present-results cleandesk-search-results)))
     (when (null arg)
       (let ((current-folder default-directory)
             (mdfind-search-string (read-from-minibuffer "Search for: "))
@@ -238,10 +236,17 @@ all Cleandesk directories."
 		(when (and (stringp item)
                            (string-prefix-p "/" item))
                   (push item cleandesk-search-results))))))
-      (setq cleandesk-search-results (nreverse cleandesk-search-results))
-      (push "*Cleandesk search findings*" cleandesk-search-results)
-      (dired cleandesk-search-results)))
+	(cleandesk-present-results cleandesk-search-results)))
   (when (not (is-mac-p))
     (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only."))))
+
+(defun cleandesk-present-results (results)
+  "If there are results of the search they are presented in dired."
+  (let* ((results (nreverse results)))
+      (when results
+	(push "*Cleandesk search findings*" results)
+	(dired results))
+      (when (not results)
+	(message "Search has produced no results."))))
 
 (provide 'cleandesk)
