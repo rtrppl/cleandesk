@@ -1,12 +1,12 @@
-;; cleandesk.el --- -*- lexical-binding: t -*-
-
 ;; Copyright (C) 2024 Free Software Foundation, Inc.
 
+;;; cleandesk.el --- Quickly process files across directories 
+
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
-;; URL:
+;; URL: https://github.com/rtrppl/cleandesk
 ;; Version: 0.4
-;; Package-Requires: emacs "26", fd
-;; Keywords: files folders dired
+;; Package-Requires: ((emacs "26"))
+;; Keywords: files
 
 ;; This file is not part of GNU Emacs.
 
@@ -27,20 +27,22 @@
 
 ;; cleandesk.el allows for quickly processing files across directories.
 ;;
+;;
+;;; Code:
 
 (require 'dired)  ; For dired-get-marked-files
 (require 'json)   ; For json-encode
 
 (defvar cleandesk-inbox-folder "~/")  ;; Using the home folder as a default starting point
-(defvar date-string "%Y_%m_%d-%H%M%S-")
+(defvar cleandesk-date-string "%Y_%m_%d-%H%M%S-")
 (defvar cleandesk-search-tool "fd") ;; choose between find and fd; fd is much faster and standard
-(defvar fd-search-string "-t d --no-hidden .")
-(defvar find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
+(defvar cleandesk-fd-search-string "-t d --no-hidden .")
+(defvar cleandesk-find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
 (defvar cleandesk-folders nil "All folders cleandesk operates on.")
 (defvar cleandesk-name-directory (make-hash-table :test 'equal))
 (defvar cleandesk-data-folders nil "Includes all folders that cleandesk should opperate on (excluding subfolders).")
 
-(defun is-mac-p ()
+(defun cleandesk-is-mac-p ()
   "Return t if the current system is a Mac (Darwin)."
 ;; Cleandesk needs to check this because cleandesk-search uses mdfind (Mac-only).
   (eq system-type 'darwin))
@@ -53,9 +55,9 @@
    (dolist (cleandesk-data-folder cleandesk-data-folders)
      (with-temp-buffer
        (when (string-equal cleandesk-search-tool "fd")
-	 (insert (shell-command-to-string (concat "fd " fd-search-string " '" cleandesk-data-folder "' "))))
+	 (insert (shell-command-to-string (concat "fd " cleandesk-fd-search-string " '" cleandesk-data-folder "' "))))
        (when (string-equal cleandesk-search-tool "find")
-	 (insert (shell-command-to-string (concat "find " cleandesk-data-folder " " find-search-string))))
+	 (insert (shell-command-to-string (concat "find " cleandesk-data-folder " " cleandesk-find-search-string))))
        (let ((temp-folders (split-string (buffer-string) "\n" t)))
 	 (setq cleandesk-folders (append temp-folders cleandesk-folders)))))
 	 (setq cleandesk-folders (append cleandesk-data-folders cleandesk-folders)))
@@ -94,7 +96,7 @@
 	 (let* ((old-filename file)
 		(extension (file-name-extension file))
 		(old-directory (file-name-directory file))
-		(time (format-time-string date-string (nth 5 (file-attributes file))))
+		(time (format-time-string cleandesk-date-string (nth 5 (file-attributes file))))
 		(new-filename (concat old-directory time token "." extension))
 		(suffix "A")
 		(last-char (aref suffix 0)))
@@ -128,13 +130,13 @@
 
 
 (defun cleandesk-prepend-date ()
- "Prepends date-string to one or multiple marked files."
+ "Prepends cleandesk-date-string to one or multiple marked files."
  (interactive)
  (let ((marked-files (dired-get-marked-files)))
        (dolist (file marked-files)
 	 (let* ((old-filename (file-name-nondirectory file))
 		(old-directory (file-name-directory file))
-		(time (format-time-string date-string (nth 5 (file-attributes file))))
+		(time (format-time-string cleandesk-date-string (nth 5 (file-attributes file))))
 		(new-filename (concat old-directory time old-filename)))
 	(rename-file old-filename new-filename))))
   (revert-buffer))
@@ -208,7 +210,7 @@ Cleandesk considers."
 This is based on mdfind/Spotlight. If called with C-u, search will expand to 
 all Cleandesk directories."
   (interactive "P")
-  (when (is-mac-p)
+  (when (cleandesk-is-mac-p)
     (when (equal arg '(4))
     (cleandesk-get-folder-list)
     (let ((cleandesk-mdfind-folders (hash-table-values cleandesk-name-directory))
@@ -237,7 +239,7 @@ all Cleandesk directories."
                            (string-prefix-p "/" item))
                   (push item cleandesk-search-results))))))
 	(cleandesk-present-results cleandesk-search-results)))
-  (when (not (is-mac-p))
+  (when (not (cleandesk-is-mac-p))
     (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only."))))
 
 (defun cleandesk-present-results (results)
@@ -250,3 +252,5 @@ all Cleandesk directories."
 	(message "Search has produced no results."))))
 
 (provide 'cleandesk)
+
+;;; cleandesk.el ends here
