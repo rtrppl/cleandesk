@@ -4,7 +4,7 @@
 
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL: https://github.com/rtrppl/cleandesk
-;; Version: 0.4
+;; Version: 0.4.1
 ;; Package-Requires: ((emacs "26"))
 ;; Keywords: files
 
@@ -111,6 +111,26 @@
 		(rename-file old-filename new-filename)))))))
   (revert-buffer))
 
+(defun cleandesk-create-org-link-inline-image ()
+ "Copy the org-link to one or multiple marked images to the kill-ring."
+ (interactive)
+ (let ((marked-files (dired-get-marked-files)))
+   (with-temp-buffer 
+     (dolist (file marked-files)
+       (insert (concat "\[\[file:" file "\]\]\n")))
+     (kill-new (buffer-substring (point-min) (point-max))))	 
+  (revert-buffer)))
+
+(defun cleandesk-create-org-link ()
+ "Copy the org-link to one or multiple marked files to the kill-ring."
+ (interactive)
+ (let ((marked-files (dired-get-marked-files)))
+   (with-temp-buffer 
+     (dolist (file marked-files)
+       (insert (concat "\[\[file:" file "\]\[" (file-name-nondirectory file) "\]\]\n")))
+     (kill-new (buffer-substring (point-min) (point-max))))
+  (revert-buffer)))
+
 (defun cleandesk-simple-rename ()
  "Replacement for dired-do-rename for one or multiple marked files."
  (interactive)
@@ -127,7 +147,6 @@
 		  (setq new-filename (read-from-minibuffer "Filename already exists! Please adjust : " token))
 		  (rename-file old-filename new-filename))))))))
   (revert-buffer))
-
 
 (defun cleandesk-prepend-date ()
  "Prepends cleandesk-date-string to one or multiple marked files."

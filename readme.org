@@ -4,13 +4,16 @@
 
 ** The Idea
 
-Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
+Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It also allows to quickly change directories or search files (macOS only). Cleandesk draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
 
-To be sure, vanilla Dired probably can do most of this. But perhaps neither as convenient nor as swift.
+To be sure, vanilla Dired probably can do most of this. But perhaps neither as convenient nor as swift. I still use Cleandesk daily (January 2025). 
 
 ** Changelog
 
-**Version 0.4**
+*0.4.1* 
+- Some fixes + =cleandesk-create-org-link= and =cleandesk-create-org-link-inline-image=
+
+*0.4*
 - Added =cleandesk-simple-rename=, see [[Rename][Rename]]
 
 ** Installation 
@@ -74,7 +77,7 @@ If you are on a Mac (see below) you may want to add a keybinding for cleandesk-s
 
 *** To the Inbox
 
-To quickly go to the Cleandesk inbox invoke M-x =cleandesk-open-inbox= (or the keybinding you have set). This will open a new Dired buffer showing the Cleandesk inbox.
+To quickly go to the Cleandesk inbox invoke M-x =cleandesk-open-inbox= (or the keybinding you have set). This will open a new Dired buffer showing the Cleandesk inbox. For me this is the Desktop.
 
 *** Jump to a Directory
 
@@ -88,7 +91,7 @@ This function and =cleandesk-move-files= are using fd, which can rapidly process
 
 *** Rename
 
-=cleandesk-rename= prepends the creation date and also renames the file itself (but does not change the file extension). This also works across all marked files in Dired. =cleandesk-simple-rename= is a simple replacement function for =dired-do-rename=, which does have some issues when using it with ivy or consult (at least for me). The function also takes the existing filename as basis for the rename, speeding up the process. 
+=cleandesk-rename= prepends the creation date and also renames the file itself (but does not change the file extension). This also works across all marked files in Dired. =cleandesk-simple-rename= is a simple replacement function for =dired-do-rename=, which does have some issues when using it with ivy or Vertico (at least for me). The function also takes the existing filename as basis for the rename, speeding up the process. 
 
 *** Move Files
 
