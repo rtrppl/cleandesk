@@ -43,7 +43,7 @@ If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 (setq cleandesk-search-tool "find") ; standard is fd
 #+end_src
 
-*If you want to use =cleandesk-show-tree= you also need tree.* Again, an easy way to install it is homebrew, e.g. =brew install tree=. 
+*If you want to use cleandesk-show-tree you also need tree.* Again, an easy way to install it is homebrew, e.g. =brew install tree=. 
 
 *Attention:* The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk directory*. A JSON list of these folders is stored in =~/.cleandesk-directory-list=. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). 
 
@@ -112,7 +112,7 @@ This function and =cleandesk-move-files= are using fd, which can rapidly process
 <img src="/cleandesk-show-tree.png" alt="A cleandesk-show-tree buffer">
 #+END_HTML
 
-=cleandesk-show-tree= combines the output of =tree= and =fd= to create a tree of folders for the current folder shown in Dired. Every folder name is linked to that folder (see screenshot above). Use n, p to navigate, o to open in Dired, O to open using system default (this uses =org-open-at-point=), and q for exit. 
+=cleandesk-show-tree= combines the output of =tree= and =fd= to create an Orgmode buffer showing a tree of folders for the currently visited Dired folder. Every folder name is linked (see screenshot above). Use n, p to navigate, o to open a folder in Dired, O to open it using the system default (this uses =org-open-at-point=), and q for exit. 
 
 *** Housekeeping 
 
