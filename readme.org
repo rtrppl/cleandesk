@@ -4,11 +4,14 @@
 
 ** The Idea
 
-Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It also allows to quickly change directories or search files (macOS only). Cleandesk draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]] and [[https://github.com/sharkdp/fd][fd]]. 
+Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It also allows to quickly change directories or search files (macOS only). Cleandesk draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]], [[https://github.com/sharkdp/fd][fd]] (and [[https://oldmanprogrammer.net/source.php?dir=projects/tree][tree]] for =cleandesk-show-tree=). 
 
 To be sure, vanilla Dired probably can do most of this. But perhaps neither as convenient nor as swift. I still use Cleandesk daily (January 2025). 
 
 ** Changelog
+
+*0.5*
+- Adds =cleandesk-show-tree=
 
 *0.4.1* 
 - Some fixes + =cleandesk-create-org-link= and =cleandesk-create-org-link-inline-image=
@@ -39,6 +42,8 @@ If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 #+begin_src elisp
 (setq cleandesk-search-tool "find") ; standard is fd
 #+end_src
+
+*If you want to use =cleandesk-show-tree= you also need tree.* Again, an easy way to install it is homebrew, e.g. =brew install tree=. 
 
 *Attention:* The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk directory*. A JSON list of these folders is stored in =~/.cleandesk-directory-list=. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). 
 
@@ -100,6 +105,14 @@ This function and =cleandesk-move-files= are using fd, which can rapidly process
 *** Search
 
 =cleandesk-search= uses the macOS Spotlight feature to search for a specific term in all files in the current directory. If called with C-u, search expands to all Cleandesk folders.
+
+*** Tree
+
+#+BEGIN_HTML
+<img src="/cleandesk-show-tree.png" alt="A cleandesk-show-tree buffer">
+#+END_HTML
+
+=cleandesk-show-tree= combines the output of =tree= and =fd= to create a tree of folders for the current folder shown in Dired. Every folder name is linked to that folder (see screenshot above). Use n, p to navigate, o to open in Dired, O to open using system default (this uses =org-open-at-point=), and q for exit. 
 
 *** Housekeeping 
 
