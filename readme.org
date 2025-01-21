@@ -11,7 +11,7 @@ To be sure, vanilla Dired probably can do most of this. But perhaps neither as c
 ** Changelog
 
 *0.5.1*
-- Small fixes + added [[https://github.com/phiresky/ripgrep-all][rga]] and [[https://github.com/BurntSushi/ripgrep][rg]] as options for =cleandesk-search=; see [[* Search][Search]] below
+- Small fixes + added [[https://github.com/phiresky/ripgrep-all][rga]] and [[https://github.com/BurntSushi/ripgrep][rg]] as options for =cleandesk-search=; see *Search* below
 
 *0.5*
 - Added =cleandesk-show-tree=
@@ -20,7 +20,7 @@ To be sure, vanilla Dired probably can do most of this. But perhaps neither as c
 - Some fixes + =cleandesk-create-org-link= and =cleandesk-create-org-link-inline-image=
 
 *0.4*
-- Added =cleandesk-simple-rename=, see [[* Rename][Rename]] below
+- Added =cleandesk-simple-rename=, see *Rename* below
 
 ** Installation 
 
@@ -107,7 +107,7 @@ This function and =cleandesk-move-files= are using fd, which can rapidly process
 
 *** Search
 
-=cleandesk-search= uses the macOS Spotlight feature to search for a specific term in all files in the current directory. If called with C-u, search expands to all Cleandesk folders. There does not seem to be a good alternative that is capable of searching within .pdf or .docx files (that I know of). Despite this, I have added /ripgrep-all/ (which is promising for PDFs and some other types of documents but very slow) and /ripgrep/ as options. In your init.el you would need to add:
+=cleandesk-search= uses the macOS Spotlight feature to search for a specific term in all files in the current directory. If called with C-u, search expands to all Cleandesk folders. There does not seem to be a good open-source/platform-independent alternative that is capable of searching within .pdf or .docx files (that I know of). Despite this, I have added [[https://github.com/phiresky/ripgrep-all][ripgrep-all]] (which is promising for PDFs and some other types of documents but very slow) and [[https://github.com/BurntSushi/ripgrep][ripgrep]] as options. In your init.el you would need to add:
 
 #+begin_src elisp
 (setq cleandesk-search-tool "rga") ;; for ripgrep-all or "rg" for ripgrep 
