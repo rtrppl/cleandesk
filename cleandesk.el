@@ -4,7 +4,7 @@
 
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL: https://github.com/rtrppl/cleandesk
-;; Version: 0.4.1
+;; Version: 0.5.1
 ;; Package-Requires: ((emacs "26"))
 ;; Keywords: files
 
@@ -35,13 +35,15 @@
 
 (defvar cleandesk-inbox-folder "~/")  ;; Using the home folder as a default starting point
 (defvar cleandesk-date-string "%Y_%m_%d-%H%M%S-")
-(defvar cleandesk-search-tool "fd") ;; choose between find and fd; fd is much faster and standard
-(defvar cleandesk-fd-search-string "-t d --no-hidden .")
-(defvar cleandesk-find-search-string "-type d ! -name '.*' | sed 's@//@/@'")
+(defvar cleandesk-metadata-tool "fd") ;; choose between find and fd; fd is much faster and standard
+(defvar cleandesk-fd-metadata-cmd "fd -t d --no-hidden .")
+(defvar cleandesk-find-metadata-cmd "-type d ! -name '.*' | sed 's@//@/@'")
 (defvar cleandesk-folders nil "All folders cleandesk operates on.")
 (defvar cleandesk-name-directory (make-hash-table :test 'equal))
 (defvar cleandesk-data-folders nil "Includes all folders that cleandesk should opperate on (excluding subfolders).")
 (defvar cleandesk-fd4tree-cmd "fd -t d --no-ignore -L .")
+(defvar cleandesk-search-tool "mdfind") ;; choose between mdfind (macOS only), rg (text documents only) and rga (slower)
+(defvar cleandesk-tree-cmd "tree -d -f -R ")
 
 (defun cleandesk-is-mac-p ()
   "Return t if the current system is a Mac (Darwin)."
@@ -55,10 +57,10 @@
  (setq cleandesk-data-folders (hash-table-values cleandesk-name-directory))
    (dolist (cleandesk-data-folder cleandesk-data-folders)
      (with-temp-buffer
-       (when (string-equal cleandesk-search-tool "fd")
-	 (insert (shell-command-to-string (concat "fd " cleandesk-fd-search-string " '" cleandesk-data-folder "' "))))
-       (when (string-equal cleandesk-search-tool "find")
-	 (insert (shell-command-to-string (concat "find " cleandesk-data-folder " " cleandesk-find-search-string))))
+       (when (string-equal cleandesk-metadata-tool "fd")
+	 (insert (shell-command-to-string (concat cleandesk-fd-metadata-cmd " '" cleandesk-data-folder "' "))))
+       (when (string-equal cleandesk-metadata-tool "find")
+	 (insert (shell-command-to-string (concat "find " cleandesk-data-folder " " cleandesk-find-metadata-cmd))))
        (let ((temp-folders (split-string (buffer-string) "\n" t)))
 	 (setq cleandesk-folders (append temp-folders cleandesk-folders)))))
 	 (setq cleandesk-folders (append cleandesk-data-folders cleandesk-folders)))
@@ -233,34 +235,48 @@ all Cleandesk directories."
   (when (cleandesk-is-mac-p)
     (when (equal arg '(4))
     (cleandesk-get-folder-list)
-    (let ((cleandesk-mdfind-folders (hash-table-values cleandesk-name-directory))
-          (mdfind-search-string (read-from-minibuffer "Search for: "))
+    (let ((cleandesk-search-folders (hash-table-values cleandesk-name-directory))
+          (search-string (read-from-minibuffer "Search for: "))
           cleandesk-search-results)  ; Initialize as empty list
-      (dolist (cleandesk-mdfind-folder cleandesk-mdfind-folders)
+      (dolist (cleandesk-mdfind-folder cleandesk-search-folders)
 	(with-temp-buffer
-          (let ((cmd (concat "mdfind " mdfind-search-string " -onlyin " cleandesk-mdfind-folder)))
-            (insert (shell-command-to-string cmd))
-            (let ((findings (split-string (buffer-string) "\n" t)))
-              (dolist (item findings)
-		(when (and (stringp item)
-                           (string-prefix-p "/" item))
-                  (push item cleandesk-search-results)))))))
-      (cleandesk-present-results cleandesk-search-results)))
-    (when (null arg)
-      (let ((current-folder default-directory)
-            (mdfind-search-string (read-from-minibuffer "Search for: "))
-            cleandesk-search-results) 
-	(with-temp-buffer
-          (let ((cmd (concat "mdfind " mdfind-search-string " -onlyin " current-folder)))
-            (insert (shell-command-to-string cmd))
+	  (when (string-equal cleandesk-search-tool "mdfind")
+            (let ((cmd (concat "mdfind " search-string " -onlyin " cleandesk-mdfind-folder)))
+              (insert (shell-command-to-string cmd))))
+	  (when (string-equal cleandesk-search-tool "rga")
+            (let ((cmd (concat "rga -l -e \"" search-string "\" " cleandesk-mdfind-folder)))
+              (insert (shell-command-to-string cmd))))
+	  (when (string-equal cleandesk-search-tool "rg")
+            (let ((cmd (concat "rg -l -e \"" search-string "\" " cleandesk-mdfind-folder)))
+              (insert (shell-command-to-string cmd))))
             (let ((findings (split-string (buffer-string) "\n" t)))
               (dolist (item findings)
 		(when (and (stringp item)
                            (string-prefix-p "/" item))
                   (push item cleandesk-search-results))))))
+      (cleandesk-present-results cleandesk-search-results))))
+    (when (null arg)
+      (let ((current-folder (shell-quote-argument (cleandesk-return-current-folder)))
+            (search-string (read-from-minibuffer "Search for: "))
+            cleandesk-search-results) 
+	(with-temp-buffer
+          (when (string-equal cleandesk-search-tool "mdfind")
+	    (let* ((cmd (concat "mdfind " search-string " -onlyin " current-folder)))
+              (insert (shell-command-to-string cmd))))
+	  (when (string-equal cleandesk-search-tool "rga")
+            (let* ((cmd (concat "rga -i -l -e \"" search-string "\" " current-folder)))
+              (insert (shell-command-to-string cmd))))
+	  (when (string-equal cleandesk-search-tool "rg")
+            (let* ((cmd (concat "rg -i -l -e \"" search-string "\" " current-folder)))
+	      (insert (shell-command-to-string cmd))))
+          (let* ((findings (split-string (buffer-string) "\n" t)))
+            (dolist (item findings)
+	      (when (and (stringp item)
+                         (string-prefix-p "/" item))
+                  (push item cleandesk-search-results)))))
 	(cleandesk-present-results cleandesk-search-results)))
   (when (not (cleandesk-is-mac-p))
-    (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only."))))
+    (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only.")))
 
 (defun cleandesk-present-results (results)
   "If there are results of the search they are presented in dired."
@@ -282,10 +298,10 @@ all Cleandesk directories."
   (let* ((cleandesk-subfolders (make-hash-table :test 'equal))
 	 (subfolder-list))
     (with-temp-buffer
-       (when (string-equal cleandesk-search-tool "fd")
+       (when (string-equal cleandesk-metadata-tool "fd")
 	 (insert (shell-command-to-string (concat cleandesk-fd4tree-cmd " \"" folder "\" "))))
-       (when (string-equal cleandesk-search-tool "find")
-	 (insert (shell-command-to-string (concat "find " folder " " cleandesk-find-search-string))))
+       (when (string-equal cleandesk-metadata-tool "find")
+	 (insert (shell-command-to-string (concat "find " folder " " cleandesk-find-metadata-cmd))))
        (let ((temp-folders (split-string (buffer-string) "\n" t)))
 	 (setq subfolder-list (append temp-folders subfolder-list))))
     (dolist (item subfolder-list)

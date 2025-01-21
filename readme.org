@@ -4,14 +4,17 @@
 
 ** The Idea
 
-Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It also allows to quickly change directories or search files (macOS only). Cleandesk draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]], [[https://github.com/sharkdp/fd][fd]] (and [[https://oldmanprogrammer.net/source.php?dir=projects/tree][tree]] for =cleandesk-show-tree=). 
+Pictures, PDFs and many other kinds of files frequently end up on my Desktop. In the past, I used [[https://www.noodlesoft.com][Hazel]] and/or [[https://www.devontechnologies.com/apps/devonthink][Devonthink]] to automatically rename and refile these files. Cleandesk offers an alternative (manual) approach for these tasks from within Emacs. It also allows to quickly change directories or search files. Cleandesk draws on [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][Dired]], [[https://github.com/sharkdp/fd][fd]] (and [[https://oldmanprogrammer.net/source.php?dir=projects/tree][tree]] for =cleandesk-show-tree=). 
 
 To be sure, vanilla Dired probably can do most of this. But perhaps neither as convenient nor as swift. I still use Cleandesk daily (January 2025). 
 
 ** Changelog
 
+*0.5.1*
+- Small fixes + added [[https://github.com/phiresky/ripgrep-all][rga]] and [[https://github.com/BurntSushi/ripgrep][rg]] as options for =cleandesk-search=; see [[Search][Search]]
+
 *0.5*
-- Adds =cleandesk-show-tree=
+- Added =cleandesk-show-tree=
 
 *0.4.1* 
 - Some fixes + =cleandesk-create-org-link= and =cleandesk-create-org-link-inline-image=
@@ -104,7 +107,11 @@ This function and =cleandesk-move-files= are using fd, which can rapidly process
 
 *** Search
 
-=cleandesk-search= uses the macOS Spotlight feature to search for a specific term in all files in the current directory. If called with C-u, search expands to all Cleandesk folders.
+=cleandesk-search= uses the macOS Spotlight feature to search for a specific term in all files in the current directory. If called with C-u, search expands to all Cleandesk folders. I would prefer to use an open-source alternative but there is no good alternative able to look into .pdf or .docx files (that I know of). Despite this, I have added /ripgrep-all/ and /ripgrep/ as options. In your init.el you would need to add:
+
+#+begin_src elisp
+(setq cleandesk-search-tool "rga") ;; for ripgrep-all or "rg" for ripgrep 
+#+end_src
 
 *** Tree
 
