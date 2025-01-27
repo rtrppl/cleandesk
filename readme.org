@@ -10,6 +10,9 @@ To be sure, vanilla Dired probably can do most of this. But perhaps neither as c
 
 ** Changelog
 
+*0.5.2*
+- Added options to manually set =cleandesk-data-folders= and to specify location of the dotfile; improved documentation
+
 *0.5.1*
 - Small fixes + added [[https://github.com/phiresky/ripgrep-all][rga]] and [[https://github.com/BurntSushi/ripgrep][rg]] as options for =cleandesk-search=; see *Search* below
 
@@ -28,17 +31,23 @@ Clone the repository:
 
 =git clone https://github.com/rtrppl/cleandesk=
 
+*** Step 1: .emacs
+
 To run Cleandesk, you need to load the package by adding it to your .emacs or init.el:
 
 #+begin_src elisp
 (load "/path/to/cleandesk/cleandesk.el") ; You actually only need cleandesk.el
 #+end_src
 
+*** Step 2: Inbox
+
 If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 
 #+begin_src elisp
 (setq cleandesk-inbox-folder "~/path/to/inbox")
 #+end_src
+
+*** Step 3: Installing "fd" or using "find" (bonus: installing "tree")
 
 *In order to use Cleandesk you'll want fd installed on your machine.* The easiest way to do so might be [[https://brew.sh][homebrew]], i.e. =brew install fd=. =fd= is much (!) faster than =find= but if you prefer =find=, you need to set this:
 
@@ -48,13 +57,33 @@ If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 
 *If you want to use cleandesk-show-tree you also need tree.* Again, an easy way to install it is homebrew, e.g. =brew install tree=. 
 
-*Attention:* The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk directory*. A JSON list of these folders is stored in =~/.cleandesk-directory-list=. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). 
+*** Step 4: Cleandesk-folders
+
+These are the "parent" directories of the folders you want to jump to or move files into. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). A typical candidate might be "~/Documents". There a two ways to specify these folders:
+
+1) The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk folder*. A JSON list of these folders is stored in a file and the functions =cleandesk-add-folder= and =cleandesk-remove-folder= modify this file. The file is stored at =~/.cleandesk-directory-list=. Location and name of this dotfile can be changed via:
+
+#+begin_src elisp
+(setq cleandesk-dotfile "~/some/folder/.cleandesk-directory-list")
+#+end_src
+
+2) An alternative way to set the list of *Cleandesk folders* is to modify =cleandesk-data-folders= manually: 
+
+#+begin_src elisp
+(setq cleandesk-data-folders '("~/Documents/Some/Folder" "/Users/some/user/projects"))
+#+end_src
+
+If =cleandesk-data-folders= is set manually, the functions =cleandesk-add-folder= and =cleandesk-remove-folder= cannot be used.
+
+*** Step 5: Date strings
 
 The date-string, used by =cleandesk-prepend-date= and =cleandesk-rename= can be set via:
 
 #+begin_src elisp
 (setq date-string "%Y_%m_%d-%H%M%S-") ; this is the standard Cleandesk date-string
 #+end_src
+
+*** Step 6: Keybindings
 
 Finally, you may also want to set keybindings for the main functions (I have bound the Mac-Command Key to super/s):
 
@@ -64,21 +93,35 @@ Finally, you may also want to set keybindings for the main functions (I have bou
   (define-key dired-mode-map (kbd "J") 'cleandesk-jump-to-folder)
   (define-key dired-mode-map (kbd "M") 'cleandesk-move-files)
   (define-key dired-mode-map (kbd "z") 'cleandesk-prepend-date)
-  (define-key dired-mode-map (kbd "r") 'cleandesk-rename))
-  (define-key dired-mode-map (kbd "R") 'cleandesk-simple-rename)) ;; replaces dired-do-rename; see cleandesk-simple-rename for more
+  (define-key dired-mode-map (kbd "r") 'cleandesk-rename)
+  (define-key dired-mode-map (kbd "S") 'cleandesk-search) ;; see cleandesk-search
+  (define-key dired-mode-map (kbd "R") 'cleandesk-simple-rename) ;; replaces dired-do-rename; see cleandesk-simple-rename for more
+  (define-key dired-mode-map (kbd "T") 'cleandesk-show-tree))
 #+end_src
 
-If you are on a Mac (see below) you may want to add a keybinding for cleandesk-search:
+*** Use-package
+
+This is my current setup:
 
 #+begin_src elisp
-(global-set-key (kbd "M-s-u") 'cleandesk-open-inbox)
-(with-eval-after-load 'dired
-  (define-key dired-mode-map (kbd "J") 'cleandesk-jump-to-folder)
-  (define-key dired-mode-map (kbd "M") 'cleandesk-move-files)
-  (define-key dired-mode-map (kbd "z") 'cleandesk-prepend-date)
-  (define-key dired-mode-map (kbd "S") 'cleandesk-search)
-  (define-key dired-mode-map (kbd "R") 'cleandesk-simple-rename) ;; replaces dired-do-rename; see cleandesk-simple-rename for more
-  (define-key dired-mode-map (kbd "r") 'cleandesk-rename))
+(use-package cleandesk
+  :straight (:host github :repo "rtrppl/cleandesk"
+		   :branch "main")
+  :config
+  (setq cleandesk-inbox-folder "~/Desktop")
+  :bind
+  (:map global-map
+	      ("M-s-u" . cleandesk-open-inbox)
+	      ("M-s-j" . cleandesk-jump-to-folder))
+  (:map dired-mode-map
+	      ("J" . cleandesk-jump-to-folder)
+	      ("M" . cleandesk-move-files)
+	      ("z" . cleandesk-prepend-date)
+	      ("S" . cleandesk-search)
+	      ("R" . cleandesk-simple-rename)
+	      ("b" . cleandesk-create-org-link)
+	      ("T" . cleandesk-show-tree)
+	      ("r" . cleandesk-rename)))
 #+end_src
 
 ** Usage
