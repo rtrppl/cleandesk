@@ -61,26 +61,26 @@ If your *inbox folder* is not the Desktop, you need to tell Cleandesk:
 
 These are the "parent" directories of the folders you want to jump to or move files into. For autocompletion, Cleandesk will only consider directories that are on this list (and their sub-directories). A typical candidate might be "~/Documents". There a two ways to specify these folders:
 
-1) The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk folder*. A JSON list of these folders is stored in a file and the functions =cleandesk-add-folder= and =cleandesk-remove-folder= modify this file. The file is stored at =~/.cleandesk-directory-list=. Location and name of this dotfile can be changed via:
+- The first time you use =cleandesk-jump-to-folder= or =cleandesk-move-files= it will ask you to add a *Cleandesk folder*. A JSON list of these folders is stored in a file and the functions =cleandesk-add-folder= and =cleandesk-remove-folder= modify this file. The location of this file is stored in =cleandesk-dotfile=, the default is  =~/.cleandesk-directory-list=. To modify location and/or name of this dotfile:
 
 #+begin_src elisp
 (setq cleandesk-dotfile "~/some/folder/.cleandesk-directory-list")
 #+end_src
 
-2) An alternative way to set the list of *Cleandesk folders* is to modify =cleandesk-data-folders= manually: 
+- An alternative way to set the list of *Cleandesk folders* is to modify =cleandesk-data-folders= manually: 
 
 #+begin_src elisp
 (setq cleandesk-data-folders '("~/Documents/Some/Folder" "/Users/some/user/projects"))
 #+end_src
 
-If =cleandesk-data-folders= is set manually, the functions =cleandesk-add-folder= and =cleandesk-remove-folder= cannot be used.
+Remember that only the main "parent" directories need to be specified. If =cleandesk-data-folders= is set manually, the functions =cleandesk-add-folder= and =cleandesk-remove-folder= cannot be used.
 
 *** Step 5: Date strings
 
-The date-string, used by =cleandesk-prepend-date= and =cleandesk-rename= can be set via:
+The date-string used by =cleandesk-prepend-date= and =cleandesk-rename= can be set via:
 
 #+begin_src elisp
-(setq date-string "%Y_%m_%d-%H%M%S-") ; this is the standard Cleandesk date-string
+(setq date-string "%Y_%m_%d-%H%M%S-") ; this is the default Cleandesk date-string
 #+end_src
 
 *** Step 6: Keybindings
