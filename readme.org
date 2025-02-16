@@ -10,6 +10,9 @@ To be sure, vanilla Dired probably can do most of this. But perhaps neither as c
 
 ** Changelog
 
+*0.6*
+- Added =cleandesk-quicklook=
+
 *0.5.2*
 - Added options to manually set =cleandesk-data-folders= and to specify location of the dotfile; improved documentation
 
@@ -163,6 +166,10 @@ This function and =cleandesk-move-files= are using fd, which can rapidly process
 #+END_HTML
 
 =cleandesk-show-tree= combines the output of =tree= and =fd= to create an Orgmode buffer showing a tree of folders for the currently visited Dired folder. Every folder name is linked (see screenshot above). Use n, p to navigate, o to open a folder in Dired, O to open it using the system default (this uses =org-open-at-point=), and q for exit. 
+
+*** Quicklook
+
+=cleandesk-quicklook= opens all marked files (or the file at point) in quicklook. macOS only. 
 
 *** Housekeeping 
 

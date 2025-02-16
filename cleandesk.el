@@ -4,7 +4,7 @@
 
 ;; Maintainer: René Trappel <rtrappel@gmail.com>
 ;; URL: https://github.com/rtrppl/cleandesk
-;; Version: 0.5.2
+;; Version: 0.6
 ;; Package-Requires: ((emacs "26"))
 ;; Keywords: files
 
@@ -398,6 +398,23 @@ or open subdirectory in Dired."
                (file-directory-p path))
           (dired path)  
         (org-open-at-point)))))) 
+
+(defun cleandesk-quicklook ()
+ "Quicklook for dired."
+ (interactive)
+ (when (cleandesk-is-mac-p)
+   (let ((marked-files (dired-get-marked-files))
+	 (quicklook-cmd "qlmanage -p "))
+       (dolist (file marked-files)
+;;Using `shell-command-to-string' here to ignore the output that `qlmanage' 
+;;sends back.
+	 (shell-command-to-string (concat quicklook-cmd "\"" file "\"")))
+       (revert-buffer)))
+ (when (not (cleandesk-is-mac-p))
+   (message "cleandesk-quicklook draws on the macOS quicklook function.")))
+	    
+
+
 
 (provide 'cleandesk)
 
