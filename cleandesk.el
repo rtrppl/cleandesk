@@ -254,8 +254,7 @@ Cleandesk considers."
 This is based on mdfind/Spotlight. If called with C-u, search will expand to 
 all Cleandesk directories."
   (interactive "P")
-  (when (cleandesk-is-mac-p)
-    (when (equal arg '(4))
+  (when (equal arg '(4))
     (cleandesk-get-folder-list)
     (let ((cleandesk-search-folders (hash-table-values cleandesk-name-directory))
           (search-string (read-from-minibuffer "Search for: "))
@@ -263,6 +262,8 @@ all Cleandesk directories."
       (dolist (cleandesk-mdfind-folder cleandesk-search-folders)
 	(with-temp-buffer
 	  (when (string-equal cleandesk-search-tool "mdfind")
+	     (unless (cleandesk-is-mac-p)
+	       (error "Unfortunately mdfind (=Spotlight) is macOS-only. Please choose a different cleandesk-search-tool."))
             (let ((cmd (concat "mdfind " search-string " -onlyin " cleandesk-mdfind-folder)))
               (insert (shell-command-to-string cmd))))
 	  (when (string-equal cleandesk-search-tool "rga")
@@ -276,13 +277,15 @@ all Cleandesk directories."
 		(when (and (stringp item)
                            (string-prefix-p "/" item))
                   (push item cleandesk-search-results))))))
-      (cleandesk-present-results cleandesk-search-results))))
+      (cleandesk-present-results cleandesk-search-results)))
     (when (null arg)
       (let ((current-folder (shell-quote-argument (cleandesk-return-current-folder)))
             (search-string (read-from-minibuffer "Search for: "))
             cleandesk-search-results) 
 	(with-temp-buffer
           (when (string-equal cleandesk-search-tool "mdfind")
+	    (unless (cleandesk-is-mac-p)
+	      (error "Unfortunately mdfind (=Spotlight) is macOS-only. Please choose a different cleandesk-search-tool."))
 	    (let* ((cmd (concat "mdfind " search-string " -onlyin " current-folder)))
               (insert (shell-command-to-string cmd))))
 	  (when (string-equal cleandesk-search-tool "rga")
@@ -295,10 +298,8 @@ all Cleandesk directories."
             (dolist (item findings)
 	      (when (and (stringp item)
                          (string-prefix-p "/" item))
-                  (push item cleandesk-search-results)))))
-	(cleandesk-present-results cleandesk-search-results)))
-  (when (not (cleandesk-is-mac-p))
-    (message "Unfortunately, Cleandesk-search currently requires mdfind (=Spotlight), which is macOS-only.")))
+                (push item cleandesk-search-results)))))
+	(cleandesk-present-results cleandesk-search-results))))
 
 (defun cleandesk-present-results (results)
   "If there are results of the search they are presented in dired."
@@ -348,6 +349,7 @@ all Cleandesk directories."
      (insert (concat "# Use n, p to navigate, o to open in Dired, O to open using system default,\n# and q for exit.\n\n"))
      (insert (concat "\[\[file:" folder "\]\[" folder "\]\]\n\n"))  
      (insert (cleandesk-compile-tree folder))
+     (setq-local buffer-read-only t)
      (goto-char (point-min))
      (org-next-link)
      (org-next-link))))
@@ -399,19 +401,20 @@ or open subdirectory in Dired."
           (dired path)  
         (org-open-at-point)))))) 
 
-(defun cleandesk-quicklook ()
- "Quicklook for dired."
- (interactive)
- (when (cleandesk-is-mac-p)
-   (let ((marked-files (dired-get-marked-files))
-	 (quicklook-cmd "qlmanage -p "))
-       (dolist (file marked-files)
-;;Using `shell-command-to-string' here to ignore the output that `qlmanage' 
+(defun cleandesk-quicklook (&optional use-generic-p)
+ "Quicklook for dired. Calling this with C-u opens `preview' instead."
+ (interactive "P")
+ (unless (cleandesk-is-mac-p)
+   (error "cleandesk-quicklook draws on the macOS quicklook function."))
+ (let ((marked-files (dired-get-marked-files))
+       (quicklook-cmd "qlmanage -p "))
+   (dolist (file marked-files)
+     ;;Using `shell-command-to-string' here to ignore the output that `qlmanage' 
 ;;sends back.
-	 (shell-command-to-string (concat quicklook-cmd "\"" file "\"")))
-       (revert-buffer)))
- (when (not (cleandesk-is-mac-p))
-   (message "cleandesk-quicklook draws on the macOS quicklook function.")))
+     (if use-generic-p
+	     (shell-command (concat "open -a preview \"" file "\""))
+       (shell-command-to-string (concat quicklook-cmd "\"" file "\""))))
+   (revert-buffer)))
 	    
 
 
