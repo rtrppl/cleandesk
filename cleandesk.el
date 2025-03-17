@@ -406,15 +406,14 @@ or open subdirectory in Dired."
  (interactive "P")
  (unless (cleandesk-is-mac-p)
    (error "cleandesk-quicklook draws on the macOS quicklook function."))
- (let ((marked-files (dired-get-marked-files))
+ (let ((file (dired-get-file-for-visit))
        (quicklook-cmd "qlmanage -p "))
-   (dolist (file marked-files)
      ;;Using `shell-command-to-string' here to ignore the output that `qlmanage' 
 ;;sends back.
      (if use-generic-p
 	     (shell-command (concat "open -a preview \"" file "\""))
        (shell-command-to-string (concat quicklook-cmd "\"" file "\""))))
-   (revert-buffer)))
+   (revert-buffer))
 	    
 
 
