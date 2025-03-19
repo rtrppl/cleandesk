@@ -32,6 +32,7 @@
 
 (require 'dired)  ; For dired-get-marked-files
 (require 'json)   ; For json-encode
+(require 'org)    ; For links and cleandesk-tree
 
 (defvar cleandesk-inbox-folder "~/")  ;; Using the home folder as a default starting point
 (defvar cleandesk-date-string "%Y_%m_%d-%H%M%S-")
